@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ETS4_1">
+<title>ETS4_1 📚 Flashcard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0faf6;min-height:100vh;color:#1a1a2e}
+header{background:linear-gradient(135deg,#1D9E75,#0d7a5a);color:#fff;padding:14px 16px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+header h1{font-size:1.15rem;font-weight:700;letter-spacing:.5px}
+header p{font-size:.75rem;opacity:.85;margin-top:2px}
+.tabs{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;background:#fff;border-bottom:1px solid #e2e8f0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:2px solid #1D9E75;background:#fff;color:#1D9E75;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#1D9E75;color:#fff}
+.chips-bar{display:flex;gap:8px;padding:8px 14px;background:#fff;border-bottom:1px solid #e2e8f0;align-items:center;flex-wrap:wrap}
+.chip{font-size:.75rem;padding:4px 10px;border-radius:12px;font-weight:600}
+.chip-rem{background:#d1fae5;color:#065f46}
+.chip-for{background:#fee2e2;color:#991b1b}
+.chip-left{background:#e0f2fe;color:#0369a1}
+.chip-round{background:#f3e8ff;color:#6b21a8;margin-left:auto}
+.btn-shuffle{margin-left:4px;padding:4px 10px;border-radius:12px;border:none;background:#fef9c3;color:#854d0e;font-size:.75rem;font-weight:700;cursor:pointer}
+.progress-wrap{height:5px;background:#e2e8f0}
+.progress-bar{height:5px;background:#1D9E75;transition:width .4s}
+.card-area{display:flex;flex-direction:column;align-items:center;padding:16px 12px 8px}
+.scene{width:100%;max-width:400px;perspective:800px;cursor:pointer}
+.card{width:100%;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:relative;width:100%;min-height:200px;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 18px}
+.front{background:#fff;border:2px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.back{position:absolute;top:0;left:0;height:100%;background:linear-gradient(135deg,#1D9E75,#0d7a5a);color:#fff;transform:rotateY(180deg);width:100%;border-radius:16px}
+.word-text{font-size:1.6rem;font-weight:800;color:#1a1a2e;text-align:center;line-height:1.2}
+.pos-text{font-size:.8rem;font-weight:600;color:#1D9E75;margin-top:4px;background:#d1fae5;padding:2px 10px;border-radius:10px}
+.ipa-text{font-size:.9rem;color:#64748b;margin-top:6px;font-style:italic}
+.front-btns{display:flex;gap:10px;margin-top:14px}
+.btn-audio,.btn-hint{padding:7px 14px;border-radius:10px;border:none;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-audio{background:#e0f2fe;color:#0369a1}
+.btn-audio:hover{background:#bae6fd}
+.btn-hint{background:#fef9c3;color:#854d0e}
+.btn-hint:hover{background:#fef08a}
+.svg-hint{margin-top:8px;display:none;border-radius:10px;overflow:hidden;width:100%;max-width:220px}
+.svg-hint svg{width:100%;height:auto;display:block}
+.back-meaning{font-size:1.5rem;font-weight:800;text-align:center;line-height:1.4;color:#fff}
+.back-en{font-size:.9rem;opacity:.85;margin-top:6px;text-align:center}
+.nav-row{display:flex;gap:10px;padding:10px 12px 6px;justify-content:center;align-items:center;flex-wrap:wrap}
+.btn-nav{padding:10px 16px;border-radius:12px;border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-prev,.btn-next{background:#e2e8f0;color:#334155}
+.btn-forgot{background:#fee2e2;color:#991b1b}
+.btn-remembered{background:#d1fae5;color:#065f46}
+.btn-prev:hover,.btn-next:hover{background:#cbd5e1}
+.btn-forgot:hover{background:#fecaca}
+.btn-remembered:hover{background:#a7f3d0}
+.finish-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;text-align:center;gap:16px}
+.finish-screen h2{font-size:1.6rem;font-weight:800;color:#1D9E75}
+.finish-screen p{font-size:.95rem;color:#334155;line-height:1.6}
+.forgot-list{width:100%;max-width:400px;background:#fff;border-radius:14px;padding:14px;border:2px solid #fee2e2}
+.forgot-list h3{font-size:.9rem;font-weight:700;color:#991b1b;margin-bottom:10px}
+.forgot-list ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.forgot-list li{font-size:.85rem;padding:6px 10px;background:#fff1f2;border-radius:8px;color:#1a1a2e}
+.btn-retry,.btn-restart{padding:12px 28px;border-radius:12px;border:none;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:4px}
+.btn-retry{background:#1D9E75;color:#fff}
+.btn-restart{background:#e2e8f0;color:#334155}
+.trophy-screen{display:none;flex-direction:column;align-items:center;padding:40px 20px;text-align:center;gap:16px}
+.trophy-screen h2{font-size:2rem;font-weight:800;color:#1D9E75}
+.trophy-screen p{font-size:1rem;color:#334155}
+.btn-redo{padding:12px 28px;border-radius:12px;border:none;font-size:.95rem;font-weight:700;cursor:pointer;background:#1D9E75;color:#fff}
+#pwa-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:200}
+#pwa-banner p{flex:1;font-size:.82rem}
+#pwa-install-btn{padding:8px 14px;border-radius:10px;border:none;background:#1D9E75;color:#fff;font-weight:700;cursor:pointer;font-size:.82rem}
+#pwa-close-btn{background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 ETS4_1 — Flashcard</h1>
+  <p id="hdr-sub">Đang tải...</p>
+</header>
+
+<div class="tabs" id="tabs-bar"></div>
+
+<div class="chips-bar">
+  <span class="chip chip-rem">✓ Nhớ: <span id="c-rem">0</span></span>
+  <span class="chip chip-for">😕 Quên: <span id="c-for">0</span></span>
+  <span class="chip chip-left">📋 Còn lại: <span id="c-left">0</span></span>
+  <span class="chip chip-round" id="c-round">Vòng 1</span>
+  <button class="btn-shuffle" onclick="fcShuffle()">🔀 Shuffle</button>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="prog-bar"></div></div>
+
+<div id="main-area">
+  <div class="card-area">
+    <div class="scene" id="scene" onclick="fcFlip()">
+      <div class="card" id="card">
+        <div class="face front">
+          <div class="word-text" id="fc-w">—</div>
+          <div class="pos-text" id="fc-pos">—</div>
+          <div class="ipa-text" id="fc-ipa">—</div>
+          <div class="front-btns">
+            <button class="btn-audio" onclick="fcPlayAudio(event)">🔊 Nghe</button>
+            <button class="btn-hint" onclick="fcShowHint(event)">🖼️ Xem hình</button>
+          </div>
+          <div class="svg-hint" id="svg-hint"></div>
+        </div>
+        <div class="face back">
+          <div class="back-meaning" id="fc-vi">—</div>
+          <div class="back-en" id="fc-en-back">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav btn-prev" onclick="fcPrev()">← Prev</button>
+    <button class="btn-nav btn-forgot" onclick="fcForgot()">😕 Quên</button>
+    <button class="btn-nav btn-remembered" onclick="fcRemembered()">✓ Nhớ</button>
+    <button class="btn-nav btn-next" onclick="fcNext()">Next →</button>
+  </div>
+</div>
+
+<div class="finish-screen" id="finish-screen">
+  <h2>🔁 Ôn lại những từ đã quên</h2>
+  <p>Bạn đã hoàn thành vòng này!<br>Dưới đây là các từ cần ôn lại:</p>
+  <div class="forgot-list">
+    <h3>😕 Từ chưa nhớ</h3>
+    <ul id="forgot-ul"></ul>
+  </div>
+  <button class="btn-retry" onclick="fcRetry()">🔁 Ôn lại ngay</button>
+  <button class="btn-restart" onclick="fcRestart()">↩ Làm lại từ đầu</button>
+</div>
+
+<div class="trophy-screen" id="trophy-screen">
+  <div style="font-size:4rem">🏆</div>
+  <h2>Xuất sắc!</h2>
+  <p>Bạn đã nhớ tất cả các từ vựng!<br>Tiếp tục phát huy nhé 💪</p>
+  <button class="btn-redo" onclick="fcRestart()">↩ Làm lại</button>
+</div>
+
+<div id="pwa-banner" style="display:none">
+  <p>📱 Cài ETS4_1 như app trên điện thoại!</p>
+  <button id="pwa-install-btn">Cài ngay</button>
+  <button id="pwa-close-btn" onclick="document.getElementById('pwa-banner').style.display='none'">✕</button>
+</div>
+
+<script>
+const VOCAB = [
+  // Nhóm 1: Tài chính & Kinh doanh
+  {w:"unit",pos:"n.",ipa:"/ˈjuːnɪt/",vi:"đơn vị",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">📦</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">1 unit = 1 item</text></svg>`},
+  {w:"rent",pos:"v.",ipa:"/rɛnt/",vi:"thuê (vật)",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏠💰</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Pay to use a house</text></svg>`},
+  {w:"hire / employ / recruit",pos:"v.",ipa:"/haɪər/",vi:"thuê (người)",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🤝👔</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Hire a new employee</text></svg>`},
+  {w:"per",pos:"prep.",ipa:"/pɜːr/",vi:"mỗi / cho mỗi",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="48" font-size="28" text-anchor="middle" fill="#92400e" font-weight="bold">$10 / hour</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Ten dollars per hour</text></svg>`},
+  {w:"afford",pos:"v.",ipa:"/əˈfɔːrd/",vi:"có khả năng chi trả",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">💵✅</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Can afford the price</text></svg>`},
+  {w:"affordable / reasonable",pos:"adj.",ipa:"/əˈfɔːrdəbl/",vi:"phải chăng",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏷️😊</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">A fair, low price</text></svg>`},
+  {w:"sell",pos:"v.",ipa:"/sɛl/",vi:"bán",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🛒➡️💰</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Sell products</text></svg>`},
+  {w:"buy / purchase",pos:"v.",ipa:"/baɪ/",vi:"mua",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">💳🛍️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Buy / purchase items</text></svg>`},
+  {w:"sale",pos:"n.",ipa:"/seɪl/",vi:"kinh doanh / bán hàng",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏪📊</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Business sale</text></svg>`},
+  {w:"sales",pos:"n.",ipa:"/seɪlz/",vi:"doanh số",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">📈💹</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">Monthly sales figures</text></svg>`},
+  {w:"discount",pos:"n.",ipa:"/ˈdɪskaʊnt/",vi:"sự giảm giá",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏷️⬇️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">50% discount today!</text></svg>`},
+  {w:"offer a discount",pos:"v. phr.",ipa:"/ˈɒfər ə ˈdɪskaʊnt/",vi:"đưa ra giảm giá",group:"Tài chính & KD",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fef9c3"/><text x="100" y="52" font-size="34" text-anchor="middle">🎁💲</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#92400e">We offer a discount!</text></svg>`},
+  // Nhóm 2: Cảm xúc & Suy nghĩ
+  {w:"wonder",pos:"v.",ipa:"/ˈwʌndər/",vi:"tự hỏi",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">🤔💭</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">I wonder why...</text></svg>`},
+  {w:"quite",pos:"adv.",ipa:"/kwaɪt/",vi:"khá",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">👌😌</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">Quite good = pretty good</text></svg>`},
+  {w:"interest",pos:"n.",ipa:"/ˈɪntrəst/",vi:"niềm đam mê",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">❤️🎯</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">My interest is music</text></svg>`},
+  {w:"interest",pos:"v.",ipa:"/ˈɪntrəst/",vi:"gây hứng thú",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">✨👀</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">This topic interests me</text></svg>`},
+  {w:"have an interest",pos:"v. phr.",ipa:"/hæv ən ˈɪntrəst/",vi:"có sự đam mê",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">💡💫</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">Have an interest in art</text></svg>`},
+  {w:"be interested in",pos:"prep. phr.",ipa:"/biː ˈɪntrəstɪd ɪn/",vi:"đam mê về",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">🎨🔬</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">Interested in science</text></svg>`},
+  {w:"be glad / pleased / happy to",pos:"v. phr.",ipa:"/biː ɡlæd tuː/",vi:"vui lòng làm gì",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">😊🙌</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">I am glad to help!</text></svg>`},
+  {w:"be blown away",pos:"v. phr.",ipa:"/biː bləʊn əˈweɪ/",vi:"bị choáng ngợp",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">🤯💨</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">I was blown away!</text></svg>`},
+  {w:"relief",pos:"n.",ipa:"/rɪˈliːf/",vi:"sự nhẹ nhõm",group:"Cảm xúc & Suy nghĩ",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ede9fe"/><text x="100" y="52" font-size="34" text-anchor="middle">😮‍💨✅</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#4c1d95">A feeling of relief</text></svg>`},
+  // Nhóm 3: Giao tiếp & Phản hồi
+  {w:"figure out / find out",pos:"v. phr.",ipa:"/ˈfɪɡjər aʊt/",vi:"tìm ra",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">🔍💡</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Figure out the answer</text></svg>`},
+  {w:"chance / opportunity",pos:"n.",ipa:"/tʃæns/",vi:"cơ hội",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">🚪🌟</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">A great opportunity</text></svg>`},
+  {w:"change",pos:"n./v.",ipa:"/tʃeɪndʒ/",vi:"thay đổi",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">🔄↗️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Change the plan</text></svg>`},
+  {w:"goal / aim / objective",pos:"n.",ipa:"/ɡoʊl/",vi:"mục tiêu",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">🎯🏆</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Reach your goal!</text></svg>`},
+  {w:"respond / reply / answer",pos:"v.",ipa:"/rɪˈspɒnd/",vi:"trả lời",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">💬↩️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Reply to the email</text></svg>`},
+  {w:"response",pos:"n.",ipa:"/rɪˈspɒns/",vi:"lời phản hồi",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">📩💭</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Await your response</text></svg>`},
+  {w:"in response to",pos:"prep. phr.",ipa:"/ɪn rɪˈspɒns tuː/",vi:"để trả lời cho",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">✉️🔁</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">In response to your email</text></svg>`},
+  {w:"perhaps / maybe / probably",pos:"adv.",ipa:"/pərˈhæps/",vi:"có lẽ",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">🤷❓</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Perhaps it will rain</text></svg>`},
+  {w:"properly / well",pos:"adv.",ipa:"/ˈprɒpərli/",vi:"đúng cách",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">✅👍</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Do it properly</text></svg>`},
+  {w:"already",pos:"adv.",ipa:"/ɔːlˈrɛdi/",vi:"đã (xong)",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">☑️⏰</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Already finished!</text></svg>`},
+  {w:"ready",pos:"adj.",ipa:"/ˈrɛdi/",vi:"sẵn sàng",group:"Giao tiếp & Phản hồi",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#dbeafe"/><text x="100" y="52" font-size="34" text-anchor="middle">💪🚀</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#1e3a5f">Are you ready?</text></svg>`},
+  // Nhóm 4: Địa điểm & Sự kiện
+  {w:"district",pos:"n.",ipa:"/ˈdɪstrɪkt/",vi:"quận",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🗺️🏙️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">District 1, Ho Chi Minh</text></svg>`},
+  {w:"province",pos:"n.",ipa:"/ˈprɒvɪns/",vi:"tỉnh",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🌾🗺️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">A rural province</text></svg>`},
+  {w:"village",pos:"n.",ipa:"/ˈvɪlɪdʒ/",vi:"xã / làng",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏡🌿</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">A small village</text></svg>`},
+  {w:"valley",pos:"n.",ipa:"/ˈvæli/",vi:"thung lũng / hẻm núi",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">⛰️🌊</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">A deep valley</text></svg>`},
+  {w:"centerpiece",pos:"n.",ipa:"/ˈsɛntərˌpiːs/",vi:"vật trang trí trung tâm",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">💐🕯️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Table centerpiece</text></svg>`},
+  {w:"ballroom",pos:"n.",ipa:"/ˈbɔːlruːm/",vi:"phòng khiêu vũ",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">💃🕺</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Dance in the ballroom</text></svg>`},
+  {w:"gallery",pos:"n.",ipa:"/ˈɡæləri/",vi:"phòng trưng bày",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🖼️🏛️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Art gallery visit</text></svg>`},
+  {w:"exhibition",pos:"n.",ipa:"/ˌɛksɪˈbɪʃən/",vi:"buổi triển lãm",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🎪🖼️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Art exhibition opens</text></svg>`},
+  {w:"exhibit",pos:"n.",ipa:"/ɪɡˈzɪbɪt/",vi:"đồ triển lãm",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🏺🔍</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">A museum exhibit</text></svg>`},
+  {w:"convention / conference",pos:"n.",ipa:"/kənˈvɛnʃən/",vi:"hội nghị",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🎤👥</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Annual conference</text></svg>`},
+  {w:"seminar",pos:"n.",ipa:"/ˈsɛmɪnɑːr/",vi:"hội thảo",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">📋🎓</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Business seminar</text></svg>`},
+  {w:"conversation",pos:"n.",ipa:"/ˌkɒnvəˈseɪʃən/",vi:"cuộc hội thoại",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">💬🗣️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">A long conversation</text></svg>`},
+  {w:"arrangement",pos:"n.",ipa:"/əˈreɪndʒmənt/",vi:"sự sắp xếp",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">📅🗂️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Event arrangement</text></svg>`},
+  {w:"cushion",pos:"n.",ipa:"/ˈkʊʃən/",vi:"gối đệm",group:"Địa điểm & Sự kiện",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fce7f3"/><text x="100" y="52" font-size="34" text-anchor="middle">🛋️😴</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#831843">Soft sofa cushion</text></svg>`},
+  // Nhóm 5: Kiến thức & Nhận thức
+  {w:"knowledge",pos:"n.",ipa:"/ˈnɒlɪdʒ/",vi:"kiến thức",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">📚🧠</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">Gain knowledge</text></svg>`},
+  {w:"acknowledge",pos:"v.",ipa:"/əkˈnɒlɪdʒ/",vi:"nhận thức được / biết được",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">💡👁️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">Acknowledge the issue</text></svg>`},
+  {w:"perceive",pos:"v.",ipa:"/pərˈsiːv/",vi:"nhận thức / cảm nhận",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">👁️🌐</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">Perceive the world</text></svg>`},
+  {w:"receive",pos:"v.",ipa:"/rɪˈsiːv/",vi:"nhận",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">📬🤲</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">Receive a package</text></svg>`},
+  {w:"recipient",pos:"n.",ipa:"/rɪˈsɪpiənt/",vi:"người nhận",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">🧑‍💼📩</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">The recipient of mail</text></svg>`},
+  {w:"sender",pos:"n.",ipa:"/ˈsɛndər/",vi:"người gửi",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">📤🧑</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">The sender of the email</text></svg>`},
+  {w:"acknowledge receipt",pos:"v. phr.",ipa:"/əkˈnɒlɪdʒ rɪˈsiːt/",vi:"xác nhận đã nhận",group:"Kiến thức & Nhận thức",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#ecfdf5"/><text x="100" y="52" font-size="34" text-anchor="middle">✅📥</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#065f46">Please acknowledge receipt</text></svg>`},
+  // Nhóm 6: Hành động & Xây dựng
+  {w:"sort out",pos:"v. phr.",ipa:"/sɔːrt aʊt/",vi:"giải quyết",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🔧✅</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Sort out the problem</text></svg>`},
+  {w:"engineer",pos:"n.",ipa:"/ˌɛndʒɪˈnɪər/",vi:"kỹ sư",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">👷⚙️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">A civil engineer</text></svg>`},
+  {w:"roof",pos:"n.",ipa:"/ruːf/",vi:"mái nhà",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏠🔺</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Fix the roof</text></svg>`},
+  {w:"inspection",pos:"n.",ipa:"/ɪnˈspɛkʃən/",vi:"sự kiểm tra",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🔍📋</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Building inspection</text></svg>`},
+  {w:"conduct / implement",pos:"v.",ipa:"/ˈkɒndʌkt/",vi:"thực hiện",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">▶️📊</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Conduct a survey</text></svg>`},
+  {w:"thorough",pos:"adj.",ipa:"/ˈθʌrə/",vi:"kỹ lưỡng, tỉ mỉ",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🔬🧐</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">A thorough check</text></svg>`},
+  {w:"structure",pos:"n.",ipa:"/ˈstrʌktʃər/",vi:"cấu trúc",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏗️📐</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Building structure</text></svg>`},
+  {w:"structural",pos:"adj.",ipa:"/ˈstrʌktʃərəl/",vi:"thuộc cấu trúc",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏛️🔩</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Structural damage</text></svg>`},
+  {w:"support",pos:"v.",ipa:"/səˈpɔːrt/",vi:"hỗ trợ, nâng đỡ",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🤝🏋️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Support the team</text></svg>`},
+  {w:"support beams",pos:"n.",ipa:"/səˈpɔːrt biːmz/",vi:"dầm đỡ / xà ngang",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏗️➖</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Steel support beams</text></svg>`},
+  {w:"shingles",pos:"n.",ipa:"/ˈʃɪŋɡəlz/",vi:"mái ngói",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏠🧱</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Roof shingles</text></svg>`},
+  {w:"major / minor",pos:"adj.",ipa:"/ˈmeɪdʒər/",vi:"lớn / nhỏ",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🔴🔵</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Major vs minor issue</text></svg>`},
+  {w:"load / unload",pos:"v.",ipa:"/loʊd/",vi:"chất lên / lấy xuống",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🚚📦</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Load the truck</text></svg>`},
+  {w:"truck",pos:"n.",ipa:"/trʌk/",vi:"xe tải",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🚛</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">A big delivery truck</text></svg>`},
+  {w:"van",pos:"n.",ipa:"/væn/",vi:"xe van",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🚐</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">A white delivery van</text></svg>`},
+  {w:"wipe off",pos:"v. phr.",ipa:"/waɪp ɒf/",vi:"lau sạch",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🧹✨</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Wipe off the dust</text></svg>`},
+  {w:"throw / catch",pos:"v.",ipa:"/θroʊ/",vi:"ném / bắt",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">⚾🤾</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Throw and catch the ball</text></svg>`},
+  {w:"shovel",pos:"n./v.",ipa:"/ˈʃʌvəl/",vi:"cái xẻng / xúc",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">⛏️🌱</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Shovel the dirt</text></svg>`},
+  {w:"run through",pos:"v. phr.",ipa:"/rʌn θruː/",vi:"chạy qua / xem lướt qua",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🏃📄</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Run through the plan</text></svg>`},
+  {w:"arrange",pos:"v.",ipa:"/əˈreɪndʒ/",vi:"sắp xếp",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">📁🗂️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Arrange the files</text></svg>`},
+  {w:"rearrange",pos:"v.",ipa:"/ˌriːəˈreɪndʒ/",vi:"sắp xếp lại",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">🔄🗂️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Rearrange the furniture</text></svg>`},
+  {w:"wait in line",pos:"v. phr.",ipa:"/weɪt ɪn laɪn/",vi:"xếp hàng",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="52" font-size="34" text-anchor="middle">👥➡️</text><text x="100" y="82" font-size="12" text-anchor="middle" fill="#7c2d12">Wait in line at the store</text></svg>`},
+  {w:"row",pos:"n.",ipa:"/roʊ/",vi:"hàng ngang",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="45" font-size="20" text-anchor="middle" fill="#7c2d12">← row →</text><text x="100" y="75" font-size="12" text-anchor="middle" fill="#7c2d12">Horizontal direction</text></svg>`},
+  {w:"column",pos:"n.",ipa:"/ˈkɒləm/",vi:"cột",group:"Hành động & Xây dựng",svg:`<svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="110" fill="#fff7ed"/><text x="100" y="40" font-size="16" text-anchor="middle" fill="#7c2d12">↑ column ↓</text><text x="100" y="78" font-size="12" text-anchor="middle" fill="#7c2d12">Vertical direction</text></svg>`},
+];
+
+const GROUPS = ["Tất cả", ...new Set(VOCAB.map(v=>v.group))];
+let currentGroup = "Tất cả";
+let deck = [];
+let idx = 0;
+let remembered = [];
+let forgotten = [];
+let round = 1;
+let isFlipped = false;
+
+function getFilteredVocab(){
+  return currentGroup === "Tất cả" ? [...VOCAB] : VOCAB.filter(v=>v.group===currentGroup);
+}
+
+function buildDeck(words){
+  deck = [...words];
+  idx = 0;
+  remembered = [];
+  forgotten = [];
+  isFlipped = false;
+}
+
+function fcShuffle(){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  idx=0;
+  isFlipped=false;
+  render();
+}
+
+function render(){
+  const mainArea = document.getElementById('main-area');
+  const finishScreen = document.getElementById('finish-screen');
+  const trophyScreen = document.getElementById('trophy-screen');
+  mainArea.style.display='';
+  finishScreen.style.display='none';
+  trophyScreen.style.display='none';
+  if(deck.length===0){
+    showTrophy();return;
+  }
+  const v = deck[idx];
+  document.getElementById('fc-w').textContent = v.w;
+  document.getElementById('fc-pos').textContent = v.pos;
+  document.getElementById('fc-ipa').textContent = v.ipa;
+  document.getElementById('fc-vi').textContent = v.vi;
+  document.getElementById('fc-en-back').textContent = v.w + ' ' + v.pos;
+  // reset flip
+  const card = document.getElementById('card');
+  card.classList.remove('flipped');
+  isFlipped = false;
+  // hide hint
+  const hint = document.getElementById('svg-hint');
+  hint.style.display = 'none';
+  hint.innerHTML = '';
+  // update chips
+  document.getElementById('c-rem').textContent = remembered.length;
+  document.getElementById('c-for').textContent = forgotten.length;
+  document.getElementById('c-left').textContent = deck.length;
+  document.getElementById('c-round').textContent = round === 1 ? 'Vòng 1' : `🔁 Ôn lại: Vòng ${round}`;
+  // progress
+  const total = getFilteredVocab().length;
+  const done = remembered.length;
+  document.getElementById('prog-bar').style.width = (done/total*100)+'%';
+  // header
+  document.getElementById('hdr-sub').textContent = `${idx+1} / ${deck.length} thẻ • ${GROUPS.length-1} nhóm`;
+}
+
+function fcFlip(){
+  const card = document.getElementById('card');
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function fcPlayAudio(e){
+  e.stopPropagation();
+  const word = document.getElementById('fc-w').textContent.split('/')[0].trim();
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang='en-US'; u.rate=0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+function fcShowHint(e){
+  e.stopPropagation();
+  const v = deck[idx];
+  const hint = document.getElementById('svg-hint');
+  if(hint.style.display==='block'){hint.style.display='none';return;}
+  hint.innerHTML = v.svg;
+  hint.style.display = 'block';
+}
+
+function fcNext(){
+  if(deck.length===0)return;
+  idx = (idx+1) % deck.length;
+  isFlipped = false;
+  render();
+}
+
+function fcPrev(){
+  if(deck.length===0)return;
+  idx = (idx-1+deck.length) % deck.length;
+  isFlipped = false;
+  render();
+}
+
+function fcRemembered(){
+  if(deck.length===0)return;
+  const v = deck.splice(idx,1)[0];
+  remembered.push(v);
+  if(idx>=deck.length) idx=0;
+  if(deck.length===0){
+    checkFinish();return;
+  }
+  isFlipped=false;
+  render();
+}
+
+function fcForgot(){
+  if(deck.length===0)return;
+  const v = deck[idx];
+  forgotten.push(v.w);
+  idx=(idx+1)%deck.length;
+  isFlipped=false;
+  render();
+}
+
+function checkFinish(){
+  if(forgotten.length===0){
+    showTrophy();
+  } else {
+    showFinish();
+  }
+}
+
+function showFinish(){
+  document.getElementById('main-area').style.display='none';
+  document.getElementById('finish-screen').style.display='flex';
+  document.getElementById('trophy-screen').style.display='none';
+  const ul = document.getElementById('forgot-ul');
+  ul.innerHTML = '';
+  // Show unique forgotten words
+  const uniq = [...new Set(forgotten)];
+  uniq.forEach(w=>{
+    const li = document.createElement('li');
+    li.textContent = w;
+    ul.appendChild(li);
+  });
+}
+
+function showTrophy(){
+  document.getElementById('main-area').style.display='none';
+  document.getElementById('finish-screen').style.display='none';
+  document.getElementById('trophy-screen').style.display='flex';
+}
+
+function fcRetry(){
+  const uniq = [...new Set(forgotten)];
+  const retryWords = VOCAB.filter(v => uniq.includes(v.w));
+  round++;
+  buildDeck(retryWords);
+  render();
+}
+
+function fcRestart(){
+  round=1;
+  buildDeck(getFilteredVocab());
+  render();
+}
+
+function buildTabs(){
+  const bar = document.getElementById('tabs-bar');
+  bar.innerHTML='';
+  GROUPS.forEach(g=>{
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(g===currentGroup?' active':'');
+    const count = g==='Tất cả' ? VOCAB.length : VOCAB.filter(v=>v.group===g).length;
+    btn.textContent = `${g} (${count})`;
+    btn.onclick=()=>{
+      currentGroup=g;
+      round=1;
+      buildDeck(getFilteredVocab());
+      buildTabs();
+      render();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+// PWA
+const PWA_NAME='ETS4_1 – Flashcard';
+const PWA_SHORT='ETS4_1';
+const PWA_EMOJI='📚';
+const PWA_COLOR='#1D9E75';
+
+function injectManifest(){
+  const icons=[{src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231D9E75'/><text y='.9em' font-size='80' x='10'>📚</text></svg>`,sizes:'any',type:'image/svg+xml'}];
+  const m={name:PWA_NAME,short_name:PWA_SHORT,start_url:'.',display:'standalone',background_color:'#f0faf6',theme_color:PWA_COLOR,icons};
+  const blob=new Blob([JSON.stringify(m)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('link');
+  link.rel='manifest';link.href=url;
+  document.head.appendChild(link);
+}
+
+function registerSW(){
+  if('serviceWorker' in navigator){
+    const sw=`self.addEventListener('fetch',e=>e.respondWith(caches.open('fc-v1').then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res;})))))`;
+    const blob=new Blob([sw],{type:'text/javascript'});
+    const url=URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(()=>{});
+  }
+}
+
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  const banner=document.getElementById('pwa-banner');
+  banner.style.display='flex';
+  document.getElementById('pwa-install-btn').onclick=()=>{
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{banner.style.display='none';deferredPrompt=null;});
+  };
+});
+
+injectManifest();
+registerSW();
+buildTabs();
+buildDeck(getFilteredVocab());
+render();
+</script>
+</body>
+</html>
